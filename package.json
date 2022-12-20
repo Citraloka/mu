@@ -1,7 +1,7 @@
 {
-  "name": "fetch",
+  "name": "MU",
   "version": "1.0.0",
-  "description": "Belajar Fetch",
+  "description": "MU NFT",
   "main": "multimu.js",
   "scripts": {
     "start": "node multimu.js",
