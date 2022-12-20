@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const cw = require('crypto-wallets');
 const randomUseragent = require('random-useragent');
+const { faker } = require('@faker-js/faker');
 
 const genhead = randomUseragent.getRandom(function (ua) {
     return ua.browserName === 'Chrome';
@@ -53,8 +54,12 @@ const genhead = randomUseragent.getRandom(function (ua) {
         return res_f;
     }
 
-    const randgmail = async () => {
-        return getapi('https://api.namefake.com/indonesian-indonesia');
+    // const randgmail = async () => {
+    //     return getapi('https://api.namefake.com/indonesian-indonesia');
+    // }
+
+    const randgmail2 = async () => {
+        return faker.internet.email('', '','gmail.com');
     }
 
     const sipaling = async () => {
@@ -97,8 +102,8 @@ const genhead = randomUseragent.getRandom(function (ua) {
     }
 
     const kedua = async (wallet_tz) => {
-        var email   = await randgmail();
-        var gmail   = email["username"]+'@gmail.com';
+        var gmail   = await randgmail2();
+        // var gmail   = email["username"]+'@gmail.com';
         // console.log('[-]  Gmail | ' + gmail);
 
         var data_email  = `{"wallet_address": "${wallet_tz}","email": "${gmail}","marketing_consent": true}`;
@@ -220,7 +225,7 @@ const genhead = randomUseragent.getRandom(function (ua) {
     (async () => {
         console.log(`
                   ==========================================================
-                  ============= AUTO CREATE + CLAIM x 2 CAPTCHA ============
+                  ========= AUTO CREATE & CLAIM NFT MU x 2 CAPTCHA =========
                   ========================================================== 
                   
                   Note : 
