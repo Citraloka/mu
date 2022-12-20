@@ -5,8 +5,8 @@ const cw = require('crypto-wallets');
 
 
     //----------------------------------------------------------------------------------------------------------------------------  
-    //Function
 
+    
     const getapi = async (url) => {
         var req_f      = fetch(url);
         //result JSON
@@ -53,6 +53,25 @@ const cw = require('crypto-wallets');
 
     function delay(time) {
         return new Promise(resolve => setTimeout(resolve, time));
+    }
+
+    async function save(content, file){
+        // fs.open('wallet.txt', 'w+', function(err, file){
+        fs.open(file, 'a+', function(err, file){
+            if (err) throw err;
+    
+            fs.writeFile(file, content, (err) => {
+                if (err) throw err;
+                //console.log(`Dono...`)
+            })
+        })
+    }
+
+    async function genwallet(){
+        // mainnet for XTZ
+        var cok     = cw.generateWallet('XTZ');
+    
+        return cok;
     }
 
     const pertama = async (wallet_tz) => {
@@ -133,6 +152,7 @@ const cw = require('crypto-wallets');
             //save data wallet
             var text_save = `${type_nft}|${name_nft}|${wallet_tz}|${pkey}\n`;
             await save(text_save, 'result_wallet.txt');
+            console.log("    [✓] Save data to file");
         } else {
             console.log("    [x] Somethings Error !");
         }
@@ -141,89 +161,72 @@ const cw = require('crypto-wallets');
         // process.exit(0);
     }
 
-    async function save(content, file){
-        // fs.open('wallet.txt', 'w+', function(err, file){
-        fs.open(file, 'a+', function(err, file){
-            if (err) throw err;
-    
+    const a = async (index) => {
+        var data_x = await sipaling();
+        var key2captcha = data_x.key2captcha;
+        var googlekey = data_x.googlekey;
+
+        var wallet = await genwallet();
+        var wallet_tz = wallet.address;
+        var privkey = wallet.privateKey;
+
+        console.log(`\n${index}. ${wallet_tz}`);
+
+        var req_wallet    = await pertama(wallet_tz);
+
+        if (req_wallet["data"]["has_already_registered"] != false || req_wallet["data"]["has_already_registered"] == null){
             
-    
-            fs.writeFile(file, content, (err) => {
-                if (err) throw err;
-                //console.log(`Dono...`)
-            })
-        })
+            if (req_wallet["data"]["token"] != null){
+                console.log("    [!] Wallet Registered");
+
+                //pharsing Data NFT
+                var name_nft   = req_wallet["data"]["token"]["name"];
+                var type_nft   = req_wallet["data"]["token"]["token_type"];
+                var id_nft     = req_wallet["data"]["token"]["token_id"];
+            
+                console.log("    [-] Data NFT");
+                console.log("        - Name > "+name_nft);
+                console.log("        - Type > "+type_nft);
+                console.log("        - Id   > "+id_nft);
+
+                await delay(3000);
+            } else if (req_wallet["data"]["has_already_registered"] == true) {
+                console.log("    [!] NFT has not been claimed");
+                console.log("    [!] Try to claim");
+
+                await delay(5000);
+                await ketiga(wallet_tz, privkey, key2captcha, googlekey);
+            } else {
+                console.log("    [x] Somethings Error !");
+                await delay(3000);
+            }
+        } else {
+            await delay(3000);
+            await kedua(wallet_tz);
+
+            await delay(3000);
+            await ketiga(wallet_tz, privkey, key2captcha, googlekey);
+        }
     }
 
-    async function genwallet(){
-        // mainnet for XTZ
-        var cok     = cw.generateWallet('XTZ');
-    
-        return cok;
-    }
 
     //----------------------------------------------------------------------------------------------------------------------------
-
 
     (async () => {
         console.log(`
                   ==========================================================
                   ============= AUTO CREATE + CLAIM x 2 CAPTCHA ============
-                  ========================================================== \n`);
-
-
-    //----------------------------------------------------------------------------------------------------------------------------
-
-        const data_x = await sipaling();
-        const key2captcha = data_x.key2captcha;
-        const googlekey = data_x.googlekey;
+                  ========================================================== 
+                  
+                  Note : 
+                        - Result save in 'result_wallet.txt'
+                        - Koneksi Internet stabil
+                  \n`);        
 
         const wtf     = readlineSync.question(`Berapa address ? `);
 
         for (var i = 1 ; i <= wtf ; i++){
-            var wallet = await genwallet();
-            var wallet_tz = wallet.address;
-            var privkey = wallet.privateKey;
-
-            console.log(`\n${i}. ${wallet_tz}`);
-
-            var req_wallet    = await pertama(wallet_tz);
-
-            if (req_wallet["data"]["has_already_registered"] != false || req_wallet["data"]["has_already_registered"] == null){
-                console.log("    [x] Wallet Registered or Somethings Error !");
-        
-                if (req_wallet["data"]["token"] != null){
-                    //pharsing Data NFT
-                    var name_nft   = req_wallet["data"]["token"]["name"];
-                    var type_nft   = req_wallet["data"]["token"]["token_type"];
-                    var id_nft     = req_wallet["data"]["token"]["token_id"];
-        
-                    console.log("    [-] Data NFT");
-                    console.log("        - Name > "+name_nft);
-                    console.log("        - Type > "+type_nft);
-                    console.log("        - Id   > "+id_nft);
-
-                    await delay(3000);
-                    process.exit(0);
-                } else if (req_wallet["data"]["has_already_registered"] == true) {
-                    console.log("    [!] NFT has not been claimed");
-                    console.log("    [!] Try to claim");
-
-                    await delay(5000);
-                    await ketiga(wallet_tz, privkey, key2captcha, googlekey);
-                }
-            } else {
-                    await delay(3000);
-                    await kedua(wallet_tz);
-
-                    await delay(3000);
-                    await ketiga(wallet_tz, privkey, key2captcha, googlekey);
-            }
+            await a(i);
         }
+
     })();
-
-
-    
-
-    
-
