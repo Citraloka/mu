@@ -4,4 +4,4 @@ npm install
 npm start 
 
 # Format .txt
-Type NFT | Nama NFT | Address | PrivateKey
+Type NFT | Nama NFT | Address | PrivateKey | Email
